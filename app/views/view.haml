@@ -1,0 +1,118 @@
+- @extras = capture do
+	= stylesheet_link_tag "http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css"
+	/[if lte IE 8]
+		= stylesheet_link_tag "http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css"
+	%script
+		= "var lat = " + @app.latlng[0].to_json
+		= "var lng = " + @app.latlng[1].to_json
+	= javascript_include_tag "http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"
+	= javascript_include_tag "map"
+	= javascript_include_tag "application"
+
+%ul#breadcrumb
+	%li
+		%a{:href => "http://www.lichfielddc.gov.uk/"}
+			Home
+	%li	
+		%a{:href => "http://www.lichfielddc.gov.uk/info/100001/advice_and_benefits"}
+			Licenses and Street Trading
+	%li.bc_end
+		Licensing register
+%h1 View application
+
+%p#tabs
+	%a.active{:href => "#overview", "data-destination" => "#overview"}
+		Overview
+	- if @app.activities.length > 0
+		%a{:href => "#activities", "data-destination" => "#activities"}
+			Activities
+	%a{:href => "#progress", "data-destination" => "#progress"}
+		Progress
+	%a{:href => "#dates", "data-destination" => "#dates"}
+		Dates
+
+.byEditor#overview
+
+	#map{:style => "height: 300px; width: 300px; float: right"}
+
+	%h2= @app.occupier
+
+	%p
+		%strong Address:
+		= @app.address.gsub!(/\n/, '<br />')
+
+	- unless @app.type.nil?
+		
+		%p
+			%strong Type:
+			= @app.type
+
+	- unless @app.usetype.nil?
+		
+		%p
+			%strong Main Use Type:
+			= @app.usetype
+
+	%p
+		%strong Reference Number:
+		= @app.refval
+		
+	%p
+		%strong Applicant name:
+		= @app.applicantname
+		
+	- unless @app.tradingname == ""
+
+		%p
+			%strong Trading name:
+			= @app.tradingname
+
+- if @app.activities.length > 0
+
+	#activities.byEditor
+		
+		%h2 Activities
+		
+		%table
+			%tr
+				%th Type
+				%th Days
+				%th From
+				%th To
+		
+			- @app.activities.each do |activity|
+				%tr
+					%td= activity.type
+					%td= activity.cycle
+					%td= activity.open
+					%td= activity.close
+
+.byEditor#progress
+
+	%h2 Progress
+
+	- unless @app.casetype.nil?
+		
+		%p
+			%strong Case Type:
+			= @app.casetype
+
+	- unless @app.status.nil?
+		
+		%p
+			%strong Status:
+			= @app.status
+
+.byEditor#dates
+
+	%h2 Dates
+	
+	%p
+		%strong Date recieved:
+		= app.recieveddate.strftime("%B %e, %Y")
+
+	- unless @app.closingdate.nil?
+	
+		%p
+			%strong Closing date for comments:
+			= @app.closingdate.strftime("%B %e, %Y")

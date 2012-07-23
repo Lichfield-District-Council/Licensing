@@ -1,0 +1,37 @@
+%h1 Search results
+
+- if @applications.length > 0
+
+	%table
+		%tr
+			%th
+				Application Number
+			%th
+				Applicant Name
+			%th
+				Premises address
+			%th
+				Summary of activities
+			%th
+				Date application recieved
+	
+		- @applications.each do |app|
+			%tr
+				%td
+					= link_to(app.refval, "view/#{app.refval}")
+				%td
+					= app.applicantname
+				%td
+					= app.address
+				%td
+					= app.type
+				%td
+					= app.recieveddate.strftime("%d/%m/%Y")
+	
+	= will_paginate @applications, :id => 'az_index', :renderer => BootstrapPagination::Sinatra
+
+- else
+	
+	%h2.center
+		There were no results for your search.
+		= link_to("Search again?", "/")

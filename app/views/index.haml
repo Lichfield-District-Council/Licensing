@@ -1,0 +1,48 @@
+- @extras = capture do
+	= javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"
+	= stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css"
+	= stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/ui-overcast/jquery-ui.css"
+	= javascript_include_tag "index"
+%h1 Licensing applications
+
+%form.basic_form{:action => "/search", "method" => "get"}
+	%fieldset
+
+		%p
+			= label_tag :refval, :caption => "Reference Number"
+			= input_tag :text, :name => "refval", :id => "refval", :class => "field"
+	
+		%p
+			= label_tag :address, :caption => "Town, Village or Street Name"
+			= input_tag :text, :name => "address", :id => "address", :class => "field"
+		
+		%p#showadvanced.hidden{:style => "text-align: right"}
+			%a{:href => "#"}
+				Show advanced search options
+
+		%p#hideadvanced.hidden{:style => "text-align: right"}
+			%a{:href => "#"}
+				Hide advanced search options
+		
+		#advanced
+
+			%p
+				= label_tag :within
+				= select_tag(:within, :options => [1, 2, 5], :include_blank => '')
+				mile(s) of
+				= input_tag :text, :name => "postcode", :id => "postcode", :class => "field", :placeholder => "Postcode"
+		
+			%p
+				= label_tag :date_from, :caption => "Date From"
+				= input_tag :text, :name => "date_from", :id => "date_from", :class => "field"
+			
+			%p
+				= label_tag :date_to, :caption => "Date To"
+				= input_tag :text, :name => "date_to", :id => "date_to", :class => "field"
+			
+			%p
+				= label_tag :activity, :caption => "License Type"
+				= select_tag(:activity, :collection => Codes.where(:category => "LICNTYPE").sort(:description.asc), :fields => [:description], :include_blank => '--- Please Select ---')
+		
+		%p.center
+			= input_tag :submit, :class => "button"

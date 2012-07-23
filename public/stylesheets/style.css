@@ -1,0 +1,39 @@
+p#tabs {
+    border-bottom: 1px #98339B solid;
+    padding: 2px 0;
+    margin-bottom:20px;
+}
+#tabs a {
+    font-weight: bold;
+    background-color: #98339B;
+    color: #ffffff;
+    padding: 2px 10px;
+    font-size: 1.3em;
+    margin: 0 10px 0 0;
+    border-bottom:none;
+}
+
+#tabs a.active, #tabs a:hover {
+    background-color: #fff !important;
+    border-top: 1px #98339B solid;
+    border-left: 1px #98339B solid;
+    border-right: 1px #98339B solid;
+    border-bottom: 1px #fff solid;
+    color: #49B4B4 !important;
+    font-weight: bold;
+    padding: 2px 10px;
+    font-size: 1.3em;
+}
+
+.pagination li.active a {
+	border: 1px solid #CCC !important;
+	color: #ccc !important;
+}
+
+.ui-datepicker-calendar, .ui-datepicker-calendar tr {
+	border: none !important;
+}
+
+.ui-datepicker-calendar th {
+	font-size: 0.8em;
+}
