@@ -19,9 +19,9 @@ get "/search" do
 	if params[:postcode] != ""
 		mapit = Mapit.GetPostcode(params[:postcode])
     	EARTH_RADIUS_M = 3959
-		applications = Application.where(:latlng => {'$nearSphere' => [mapit["lat"], mapit["lng"]], '$maxDistance' => Float(params[:within].to_i) / EARTH_RADIUS_M }, :refval => /#{params[:refval]}/i, :address => /#{params[:address]}/i)
+		applications = Application.where(:latlng => {'$nearSphere' => [mapit["lat"], mapit["lng"]], '$maxDistance' => Float(params[:within].to_i) / EARTH_RADIUS_M }, '$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}])
 	else 	  	
-		applications = Application.where(:refval => /#{params[:refval]}/i, :address => /#{params[:address]}/i)
+		applications = Application.where('$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}])
 	end
 	
 	if date_from != nil
@@ -32,9 +32,13 @@ get "/search" do
 		applications = applications.where(:type => params[:activity])
 	end
 	
-	@applications = applications.paginate({:order => :recieveddate.desc, :per_page=> 10, :page => params[:page]})
-	
-	render 'search'
+	if applications.count == 1
+		@app = applications.all[0]
+		render 'view'
+	else
+		@applications = applications.paginate({:order => :recieveddate.desc, :per_page=> 10, :page => params[:page]})
+		render 'search'
+	end
 end
   
   get '/view/*refval' do

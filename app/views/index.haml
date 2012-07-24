@@ -9,12 +9,8 @@
 	%fieldset
 
 		%p
-			= label_tag :refval, :caption => "Reference Number"
-			= input_tag :text, :name => "refval", :id => "refval", :class => "field"
-	
-		%p
-			= label_tag :address, :caption => "Town, Village or Street Name"
-			= input_tag :text, :name => "address", :id => "address", :class => "field"
+			= label_tag :search, :caption => "Enter a Town, Village or Street Name or Reference"
+			= input_tag :text, :name => "search", :id => "search", :class => "field"
 		
 		%p#showadvanced.hidden{:style => "text-align: right"}
 			%a{:href => "#"}

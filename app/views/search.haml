@@ -26,7 +26,7 @@
 				%td
 					= app.type
 				%td
-					= app.recieveddate.strftime("%d/%m/%Y")
+					= app.recieveddate.strftime("%d/%m/%Y") rescue nil
 	
 	= will_paginate @applications, :id => 'az_index', :renderer => BootstrapPagination::Sinatra
 
