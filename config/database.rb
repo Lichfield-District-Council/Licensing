@@ -1,4 +1,7 @@
-MongoMapper.connection = Mongo::Connection.new('localhost', nil)
+if Padrino.env == :development
+	logger = Logger.new('test.log')
+end
+MongoMapper.connection = Mongo::Connection.new('localhost', nil, :logger => logger)
 
 case Padrino.env
   when :development then MongoMapper.database = 'licensing_development'
