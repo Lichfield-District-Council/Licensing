@@ -1,0 +1,12 @@
+json.pages do
+	json.totalPages @applications.total_pages
+	json.perPage 10
+	json.currentPage @applications.current_page
+end
+json.applications(@applications) do |app|
+	json.applicationNumber app.refval
+	json.applicantName app.applicantname
+	json.address app.address
+	json.type app.type
+	json.recievedDate app.recieveddate
+end

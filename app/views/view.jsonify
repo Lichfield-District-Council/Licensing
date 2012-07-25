@@ -1,0 +1,20 @@
+json.application do
+	json.applicationNumber app.refval
+	json.occupier app.occupier
+	json.tradingName app.tradingname
+	json.applicantName app.applicantname
+	json.address app.address
+	json.type app.type
+	json.mainUse app.usetype
+	json.caseType app.casetype
+	json.status app.status
+	json.recievedDate app.recieveddate
+	json.commentsClosingDate app.closingdate
+	json.activities(app.activities) do |activity|
+		json.type activity.type
+		json.days activity.cycle
+		json.from activity.open
+		json.to activity.close
+	end
+	
+end

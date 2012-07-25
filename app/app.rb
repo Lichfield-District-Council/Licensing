@@ -10,7 +10,7 @@ class Licensing < Padrino::Application
   	render 'index'
   end
   
-get "/search" do
+get "/search", :provides => [:html, :json, :xml] do
 	require 'mapit'
 	
 	date_from = Date.to_mongo(Date.parse(params[:date_from])) rescue nil
@@ -19,7 +19,7 @@ get "/search" do
 	if params[:postcode] != ""
 		mapit = Mapit.GetPostcode(params[:postcode])
     	EARTH_RADIUS_M = 3959
-		applications = Application.where(:latlng => {'$nearSphere' => [mapit["lat"], mapit["lng"]], '$maxDistance' => Float(params[:within].to_i) / EARTH_RADIUS_M }, '$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}])
+		applications = Application.where(:latlng => {'$nearSphere' => [mapit["lat"], mapit["lng"]], '$maxDistance' => Float(params[:within].to_i) / EARTH_RADIUS_M }, '$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}]).sort(:recieveddate.desc)
 	else 	  	
 		applications = Application.where('$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}])
 	end
@@ -34,17 +34,31 @@ get "/search" do
 	
 	if applications.count == 1
 		@app = applications.all[0]
-		render 'view'
+		redirect "/view/#{@app.refval}"
 	else
 		@applications = applications.paginate({:order => :recieveddate.desc, :per_page=> 10, :page => params[:page]})
-		render 'search'
+		case content_type
+			when :html then
+				render 'search.haml'
+			when :json then
+				render 'search.jsonify'
+			when :xml then
+				render 'search.builder'
+			end
 	end
 end
   
-  get '/view/*refval' do
+  get '/view/*refval', :provides => [:html, :json, :xml] do
     refval = params[:refval].join("/")
   	@app = Application.find_by_refval(refval)
-  	render 'view'
+	case content_type
+		when :html then
+			render 'view.haml'
+		when :json then
+			render 'view.jsonify'
+		when :xml then
+			render 'view.builder'
+		end
   end
 
   ##

@@ -20,6 +20,7 @@ gem 'will_paginate-bootstrap'
 gem 'weary'
 gem 'httparty'
 gem 'json'
+gem 'jsonify'
 
 # Test requirements
 
