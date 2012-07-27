@@ -43,6 +43,7 @@ task :import => :environment do
 		app.update_attributes(
 			:refval => row["REFVAL"],
 			:applicantname => row["FULLNAME"],
+			:applicantaddress => row["LIADDRESS"],
 			:latlng => [latlng["lat"], latlng["long"]],
 			:address => row["ADDRESS"],
 			:occupier => row["CPOCCUP"],

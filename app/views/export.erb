@@ -1,0 +1,4 @@
+Licencee's Name,Licencee's Address,Postcode,Date Granted,Licence Details,Licence Number,Expiry Date,Site Address,Site Postcode,Source,Source Ref.
+<% @apps.each do |app| %>
+"<%= app.occupier %>","<%= app.applicantaddress %>","<%= app.address.match('([A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]|[A-HK-Y][0-9]([0-9]|[ABEHMNPRV-Y]))|[0-9][A-HJKPS-UW]) [0-9][ABD-HJLNP-UW-Z]{2})') %>","<%= app.recieveddate.strftime("%d/%m/%Y") %>","<%= app.type %>","<%= app.refval %>","","<%= app.address %>","<%= app.address.match('([A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]|[A-HK-Y][0-9]([0-9]|[ABEHMNPRV-Y]))|[0-9][A-HJKPS-UW]) [0-9][ABD-HJLNP-UW-Z]{2})') %>","Lichfield District Council",""
+<% end %> 

@@ -48,9 +48,9 @@ get "/search", :provides => [:html, :json, :xml] do
 	end
 end
   
-  get '/view/*refval', :provides => [:html, :json, :xml] do
-    refval = params[:refval].join("/")
-  	@app = Application.find_by_refval(refval)
+get '/view/*refval', :provides => [:html, :json, :xml] do
+	refval = params[:refval].join("/")
+	@app = Application.find_by_refval(refval)
 	case content_type
 		when :html then
 			render 'view.haml'
@@ -58,8 +58,19 @@ end
 			render 'view.jsonify'
 		when :xml then
 			render 'view.builder'
-		end
-  end
+	end
+end
+
+get 'export' do
+	require "csv"
+	@apps = Application.where(:type.in => ["Premises New Application", "Premises Conversion (Transition)", "Premises Variation", "Club Premises New Application", "Club Premises Conversion (Transition)", "Club Premises Variation"], :status => "Licence Issued").all
+	
+	@apps.each do |app|
+		puts app.refval
+	end
+	
+	render 'export.erb'
+end
 
   ##
   # Caching support
