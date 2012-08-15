@@ -18,18 +18,16 @@
 			Licenses and Street Trading
 	%li.bc_end
 		Licensing register
-%h1 View application
+%h1 View application - #{@app.refval}
 
 %p#tabs
-	%a.active{:href => "#overview", "data-destination" => "#overview"}
-		Overview
+	%a.active{:href => "#overview", "data-destination" => "#overview"}Overview
+	%a{:href => "#progress", "data-destination" => "#progress"}Progress
+	%a{:href => "#dates", "data-destination" => "#dates"}Dates
 	- if @app.activities.length > 0
-		%a{:href => "#activities", "data-destination" => "#activities"}
-			Activities
-	%a{:href => "#progress", "data-destination" => "#progress"}
-		Progress
-	%a{:href => "#dates", "data-destination" => "#dates"}
-		Dates
+		%a{:href => "#activities", "data-destination" => "#activities"}Activities
+	- if @app.notices.length > 0
+		%a{:href => "#notices", "data-destination" => "#notices"}Events
 
 .byEditor#overview
 
@@ -39,29 +37,27 @@
 
 	%p
 		%strong Address:
-		= @app.address.gsub!(/\n/, '<br />')
+		= @app.address.strip.gsub!(/\n/, '<br />')
 
-	- unless @app.type.nil?
+	- unless @app.type.blank?
 		
 		%p
 			%strong Type:
 			= @app.type
 
-	- unless @app.usetype.nil?
+	- unless @app.usetype.blank?
 		
 		%p
 			%strong Main Use Type:
 			= @app.usetype
-
-	%p
-		%strong Reference Number:
-		= @app.refval
 		
-	%p
-		%strong Applicant name:
-		= @app.applicantname
+	- unless @app.applicantname.blank?
 		
-	- unless @app.tradingname == ""
+		%p
+			%strong Applicant name:
+			= @app.applicantname
+		
+	- unless @app.tradingname.blank?
 
 		%p
 			%strong Trading name:
@@ -89,17 +85,39 @@
 					%td= activity.open
 					%td= activity.close
 
+- if @app.notices.length > 0
+	- @app.notices = @app.notices.sort_by(&:recieveddate).reverse
+	
+	#notices.byEditor
+	
+		%h2 Event notices
+		
+		%table
+			%tr
+				%th Start Date
+				%th End Date
+				%th Hours
+				%th Days
+				%th Received
+			- @app.notices.each do |notice|
+				%tr
+					%td= notice.startdate.strftime("%B %e, %Y")
+					%td= notice.enddate.strftime("%B %e, %Y")
+					%td= notice.hours
+					%td= notice.days
+					%td= notice.receiveddate.strftime("%B %e, %Y")
+
 .byEditor#progress
 
 	%h2 Progress
 
-	- unless @app.casetype.nil?
+	- unless @app.casetype.blank?
 		
 		%p
 			%strong Case Type:
 			= @app.casetype
 
-	- unless @app.status.nil?
+	- unless @app.status.blank?
 		
 		%p
 			%strong Status:
@@ -111,9 +129,9 @@
 	
 	%p
 		%strong Date recieved:
-		= app.recieveddate.strftime("%B %e, %Y")
+		= app.receiveddate.strftime("%B %e, %Y")
 
-	- unless @app.closingdate.nil?
+	- unless @app.closingdate.blank?
 	
 		%p
 			%strong Closing date for comments:

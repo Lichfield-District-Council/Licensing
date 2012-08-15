@@ -13,30 +13,32 @@ class Licensing < Padrino::Application
 get "/search", :provides => [:html, :json, :xml] do
 	require 'mapit'
 	
-	date_from = Date.to_mongo(Date.parse(params[:date_from])) rescue nil
-	date_to = Date.to_mongo(Date.parse(params[:date_to])) rescue Date.to_mongo(Date.today)
+	date_from = Date.parse(params[:date_from]).to_mongo rescue nil
+	date_to = Date.parse(params[:date_to]).to_mongo rescue Date.to_mongo(Date.today)
+	
+	if date_from != nil
+		applications = Application.where('$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}], '$or' => [{:receiveddate => {:$gte => date_from, :$lte => date_to}}, {'notices.receiveddate' => {:$gte => date_from, :$lte => date_to}}])
+	else
+		applications = Application.where('$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}])
+	end
 	
 	if params[:postcode] != ""
 		mapit = Mapit.GetPostcode(params[:postcode])
     	EARTH_RADIUS_M = 3959
-		applications = Application.where(:latlng => {'$nearSphere' => [mapit["lat"], mapit["lng"]], '$maxDistance' => Float(params[:within].to_i) / EARTH_RADIUS_M }, '$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}]).sort(:recieveddate.desc)
-	else 	  	
-		applications = Application.where('$or' => [{:refval => /#{params[:search]}/i}, {:address => /#{params[:search]}/i}])
-	end
-	
-	if date_from != nil
-		applications = applications.where(:recieveddate => {:$gte => date_from, :$lte => date_to})
+    	applications = applications.where(:latlng => {'$nearSphere' => [mapit["lat"], mapit["lng"]], '$maxDistance' => Float(params[:within].to_i) / EARTH_RADIUS_M })
 	end
 	
 	if params[:activity] != ""
 		applications = applications.where(:type => params[:activity])
 	end
 	
+	#applications.notices = applications.notices.sort_by(&:recieveddate).reverse
+	
 	if applications.count == 1
 		@app = applications.all[0]
 		redirect "/view/#{@app.refval}"
 	else
-		@applications = applications.paginate({:order => :recieveddate.desc, :per_page=> 10, :page => params[:page]})
+		@applications = applications.paginate({:order => :receiveddate.desc, :per_page=> 10, :page => params[:page]})
 		case content_type
 			when :html then
 				render 'search.haml'
@@ -63,7 +65,7 @@ end
 
 get 'export' do
 	require "csv"
-	@apps = Application.where(:type.in => ["Premises New Application", "Premises Conversion (Transition)", "Premises Variation", "Club Premises New Application", "Club Premises Conversion (Transition)", "Club Premises Variation"], :status => "Licence Issued").all
+	@apps = Application.where(:type.in => ["Premises New Application", "Premises Conversion (Transition)", "Premises Variation"], :status => "Licence Issued").all
 	
 	@apps.each do |app|
 		puts app.refval

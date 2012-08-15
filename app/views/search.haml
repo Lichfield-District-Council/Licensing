@@ -7,11 +7,13 @@
 			%th
 				Application Number
 			%th
-				Applicant Name
+				Premises name
 			%th
 				Premises address
 			%th
 				Summary of activities
+			%th
+				Status
 			%th
 				Date application recieved
 	
@@ -20,13 +22,18 @@
 				%td
 					= link_to(app.refval, "view/#{app.refval}")
 				%td
-					= app.applicantname
+					= app.occupier
 				%td
 					= app.address
 				%td
-					= app.type
+					= app.details
 				%td
-					= app.recieveddate.strftime("%d/%m/%Y") rescue nil
+					= app.status
+				%td
+					- if app.details == "Temporary Event Notice"
+						= app.notices.sort_by(&:recieveddate).reverse[0].receiveddate.strftime("%d/%m/%Y") rescue app.receiveddate.strftime("%d/%m/%Y")
+					- else
+						= app.receiveddate.strftime("%d/%m/%Y") rescue nil
 	
 	= will_paginate @applications, :id => 'az_index', :renderer => BootstrapPagination::Sinatra
 
