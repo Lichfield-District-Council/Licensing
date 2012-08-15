@@ -22,12 +22,13 @@
 
 %p#tabs
 	%a.active{:href => "#overview", "data-destination" => "#overview"}Overview
-	%a{:href => "#progress", "data-destination" => "#progress"}Progress
-	%a{:href => "#dates", "data-destination" => "#dates"}Dates
 	- if @app.activities.length > 0
 		%a{:href => "#activities", "data-destination" => "#activities"}Activities
 	- if @app.notices.length > 0
 		%a{:href => "#notices", "data-destination" => "#notices"}Events
+	- unless @app.closingdate.nil?
+		- if @app.closingdate > Date.today
+			%a{:href => "#comment", "data-destination" => "#comment"}Comment
 
 .byEditor#overview
 
@@ -50,6 +51,12 @@
 		%p
 			%strong Main Use Type:
 			= @app.usetype
+			
+	- unless @app.status.blank?
+		
+		%p
+			%strong Status:
+			= @app.status
 		
 	- unless @app.applicantname.blank?
 		
@@ -62,6 +69,19 @@
 		%p
 			%strong Trading name:
 			= @app.tradingname
+			
+	%h2 Dates
+	
+	%p
+		%strong Date recieved:
+		= app.receiveddate.strftime("%B %e, %Y")
+
+	- unless @app.closingdate.blank?
+		- if @app.closingdate > Date.today
+	
+			%p
+				%strong Closing date for comments:
+				= @app.closingdate.strftime("%B %e, %Y")
 
 	.clear
 
@@ -107,32 +127,36 @@
 					%td= notice.days
 					%td= notice.receiveddate.strftime("%B %e, %Y")
 
-.byEditor#progress
-
-	%h2 Progress
-
-	- unless @app.casetype.blank?
-		
-		%p
-			%strong Case Type:
-			= @app.casetype
-
-	- unless @app.status.blank?
-		
-		%p
-			%strong Status:
-			= @app.status
-
-.byEditor#dates
-
-	%h2 Dates
+.byEditor#comments
 	
-	%p
-		%strong Date recieved:
-		= app.receiveddate.strftime("%B %e, %Y")
+	- unless @app.closingdate.nil?
 
-	- unless @app.closingdate.blank?
-	
-		%p
-			%strong Closing date for comments:
-			= @app.closingdate.strftime("%B %e, %Y")
+		- form_tag '/comment', :method => 'post' do
+			
+			%fieldset
+				
+				%legend
+					Give your comments on this application
+				
+				%p Comments must be recieved by #{@app.closingdate.strftime("%B %e, %Y")}
+		
+				= hidden_field_tag :refval, :value => @app.refval
+				
+				%p
+					= label_tag :name
+					= text_field_tag :name, :class => "field"
+				%p
+					= label_tag :email
+					= text_field_tag :email, :class => "field"
+				%p
+					= label_tag :tel
+					= text_field_tag :tel, :class => "field"
+				%p
+					= label_tag :address
+					= text_area_tag :address, :class => "field", :rows => 5
+				%p
+					= label_tag :comments
+					= text_area_tag :comments, :class => "field", :rows => 6
+				
+				%p.center
+					= submit_tag "Send!", :class => "button"

@@ -74,6 +74,11 @@ get 'export' do
 	render 'export.erb'
 end
 
+post 'comment' do
+	deliver(:comments, :send_comments, params[:refval],params[:name],params[:email],params[:address],params[:tel],params[:comments])
+	redirect "/view/#{params[:refval]}"
+end
+
   ##
   # Caching support
   #
