@@ -1,0 +1,30 @@
+%p Hi,
+
+- if applications.count == 1
+	%p A new licensing application has been received in your area, the details are as follows:
+- else
+	%p New licensing applications have been received in your area, the details are as follows:
+	
+- applications.each do |app|
+
+	%h3= app.occupier
+	
+	%p= app.address.strip.gsub(/\n/, '<br />')
+	
+	%p= app.details
+	
+	%p More information at:
+	
+	%p
+		%a{:href => "http://licensing.lichfielddc.gov.uk/view/#{app.refval}"}
+			http://licensing.lichfielddc.gov.uk/view/#{app.refval}
+	
+	%hr
+
+%p Don't want to receive these emails any more? Click the link below, or copy and paste it into your browser's address bar:
+
+%p
+	%a{:href => "http://licensing.lichfielddc.gov.uk/remove?hash=#{hash}"}
+		http://licensing.lichfielddc.gov.uk/remove?hash=#{hash}
+
+%p This is an automated email, please do not respond directly to it.

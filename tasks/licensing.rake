@@ -4,8 +4,15 @@ task :alert => :environment do
 	
 	alerts.each do |alert|
 	
-		EARTH_RADIUS_M = 3959
-		applications = Application.where(:latlng => {'$nearSphere' => [alert.latlng[0], alert.latlng[1]], '$maxDistance' => Float(alert.radius.to_i) / EARTH_RADIUS_M })
+		EARTH_RADIUS_M = 3959		
+		applications = Application.where(:latlng => {'$nearSphere' => [alert.latlng[0], alert.latlng[1]], '$maxDistance' => Float(alert.radius.to_i) / EARTH_RADIUS_M }, '$or' => [{:receiveddate => {:$gte => alert.lastsent.to_mongo, :$lte => Date.to_mongo(Date.today)}}, {'notices.receiveddate' => {:$gte => alert.lastsent.to_mongo, :$lte => Date.to_mongo(Date.today)}}])
+		
+		if applications.count > 0
+			Licensing.deliver(:alerts, :send_alert, alert.email, alert.radius, alert.postcode, alert.hash, applications)
+		end
+		
+		alert.update_attributes(:lastsent => Date.to_mongo(Date.today))
+		alert.save
 	
 	end
 
