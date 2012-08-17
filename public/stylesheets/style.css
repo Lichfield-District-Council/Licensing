@@ -41,3 +41,17 @@ p#tabs {
 table {
 	width: 100%;
 }
+
+.notice {
+	background-color: #FFFFE0;
+	padding: 12px;
+	margin-bottom: 10px;
+	color: #111;
+	font-size: 1.1em;
+}
+
+#field-errors h3 {
+	padding-left: 25px;
+	margin: 5px 0 14px;
+	background: url(http://www.lichfielddc.gov.uk/site/styles/css_img/warning.gif) left center no-repeat
+}

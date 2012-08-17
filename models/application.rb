@@ -55,3 +55,21 @@ class Codes
   key :code, String
   key :description, String
 end
+
+class Alert
+  include MongoMapper::Document
+  ensure_index [[:latlng, '2d']]
+  
+  key :email, String
+  key :postcode, String
+  key :latlng, Array
+  key :radius, String
+  key :lastsent, Date
+  key :hash, String
+  key :confirmed, Boolean
+  
+  validates_presence_of :email
+  validates_presence_of :postcode
+  validates_presence_of :radius
+  validates_uniqueness_of :email
+end

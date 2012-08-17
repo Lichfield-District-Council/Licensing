@@ -5,22 +5,38 @@
 	= javascript_include_tag "index"
 %h1 Licensing applications
 
-%form.basic_form{:action => "/search", "method" => "get"}
-	%fieldset
+= flash_tag(:notice)
 
-		%p
-			= label_tag :search, :caption => "Enter a Town, Village or Street Name or Reference"
-			= input_tag :text, :name => "search", :id => "search", :class => "field"
-		
-		%p#showadvanced.hidden{:style => "text-align: right"}
-			%a{:href => "#"}
-				Show advanced search options
+%p#tabs
+	%a.active{:href => "#basic", "data-destination" => "#basic"}Basic search
+	%a{:href => "#advanced", "data-destination" => "#advanced"}Advanced search
+	%a.alerttab{:href => "#alerts", "data-destination" => "#alerts"}Get alerts
+	
 
-		%p#hideadvanced.hidden{:style => "text-align: right"}
-			%a{:href => "#"}
-				Hide advanced search options
+#basic.byEditor
+	%form.basic_form{:action => "/search", "method" => "get"}
+		%fieldset
+			
+			%legend
+				Basic search
+	
+			%p
+				= label_tag :search, :caption => "Enter a Town, Village or Street Name or Reference"
+				= input_tag :text, :name => "search", :id => "search", :class => "field"
+			
+			%p.center
+				= input_tag :submit, :class => "button"
 		
-		#advanced
+#advanced.byEditor
+	%form.basic_form{:action => "/search", "method" => "get"}
+		%fieldset
+			
+			%legend
+				Advanced search
+				
+			%p
+				= label_tag :location, :caption => "Town, village or street name"
+				= input_tag :text, :name => "location", :id => "location", :class => "field"
 
 			%p
 				= label_tag :within
@@ -38,7 +54,38 @@
 			
 			%p
 				= label_tag :activity, :caption => "License Type"
-				= select_tag(:activity, :collection => Codes.where(:category => "LICNTYPE").sort(:description.asc), :fields => [:description], :include_blank => '--- Please Select ---')
+				= select_tag(:activity, :options => Application.collection.distinct("type").sort, :include_blank => '--- Please Select ---')
 		
-		%p.center
-			= input_tag :submit, :class => "button"
+			%p.center
+				= input_tag :submit, :class => "button"
+
+#alerts.byEditor
+	-form_for @alert, '/alerts' do |f|
+		= f.error_messages(:header_tag => 'h3', :header_message => 'Your alert could not be generated')
+
+		- if @alert.errors.messages.length > 0
+			:javascript
+				$(document).ready(function() {	
+					$('#tabs a').removeClass('active')
+					$('.alerttab').addClass('active')
+					$('#advanced, #basic').addClass('hidden')
+					$('#alerts').removeClass('hidden')
+				});
+				
+		%fieldset
+					
+			%legend
+				Get email alerts for licensing applications in your area.
+			
+			%p
+				= f.label :email, :caption => "Your email address"
+				= f.text_field :email, :class => "field", :value => @alert.email
+
+			%p
+				= f.label :radius, :caption => "Within "
+				= f.select :radius, :options => [1, 2, 5], :include_blank => ''
+				mile(s) of
+				= f.text_field :postcode, :class => "field", :placeholder => "Postcode",  :value => @alert.postcode
+
+			%p.center
+				= input_tag :submit, :class => "button"

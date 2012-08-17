@@ -16,8 +16,11 @@
 	%li	
 		%a{:href => "http://www.lichfielddc.gov.uk/info/100001/advice_and_benefits"}
 			Licenses and Street Trading
+	%li
+		%a{:href => "/"}
+			Licensing register
 	%li.bc_end
-		Licensing register
+		View application - #{@app.refval}
 %h1 View application - #{@app.refval}
 
 %p#tabs
@@ -127,7 +130,7 @@
 					%td= notice.days
 					%td= notice.receiveddate.strftime("%B %e, %Y")
 
-.byEditor#comments
+.byEditor#comment
 	
 	- unless @app.closingdate.nil?
 

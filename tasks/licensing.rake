@@ -1,3 +1,16 @@
+task :alert => :environment do
+	
+	alerts = Alert.where(:confirmed => true)
+	
+	alerts.each do |alert|
+	
+		EARTH_RADIUS_M = 3959
+		applications = Application.where(:latlng => {'$nearSphere' => [alert.latlng[0], alert.latlng[1]], '$maxDistance' => Float(alert.radius.to_i) / EARTH_RADIUS_M })
+	
+	end
+
+end
+
 task :import => :environment do
 	require 'httparty'
 	require 'nokogiri'

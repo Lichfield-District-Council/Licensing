@@ -21,27 +21,37 @@ class Mapit
 	end
   
 	def self.GetPostcode(postcode)
-		postcode = self.postcode(postcode)
-		
+	
 		result = Hash.new
-		result["council"] = Hash.new
-		result["lat"] = postcode["wgs84_lat"]
-		result["lng"] = postcode["wgs84_lon"]
-		
-		postcode["areas"].each do |id, info|
-			if info["type"] == 'DIW' # District Ward
-				district = postcode["areas"].fetch(info["parent_area"].to_s)
-				result["council"]["id"] = district["codes"]["ons"] 
-				result["council"]["name"] = district["name"] 
-			elsif info["type"] == 'CED' # Electoral District 
-				county = postcode["areas"].fetch(info["parent_area"].to_s)
-				result["county"] = Hash.new
-				result["county"]["id"] = county["codes"]["ons"] 
-				result["county"]["name"] = county["name"]
-			elsif ['COP','LBW','LGE','MTW','UTE','UTW'].include?(info["type"])
-				council = postcode["areas"].fetch(info["parent_area"].to_s)
-				result["council"]["id"] = council["codes"]["ons"]
-				result["council"]["name"] = council["name"]
+	
+		if postcode.blank?
+			result["error"] = "No postcode entered"
+		else
+			begin
+				postcode = self.postcode(postcode)
+				
+				result["council"] = Hash.new
+				result["lat"] = postcode["wgs84_lat"]
+				result["lng"] = postcode["wgs84_lon"]
+				
+				postcode["areas"].each do |id, info|
+					if info["type"] == 'DIW' # District Ward
+						district = postcode["areas"].fetch(info["parent_area"].to_s)
+						result["council"]["id"] = district["codes"]["ons"] 
+						result["council"]["name"] = district["name"] 
+					elsif info["type"] == 'CED' # Electoral District 
+						county = postcode["areas"].fetch(info["parent_area"].to_s)
+						result["county"] = Hash.new
+						result["county"]["id"] = county["codes"]["ons"] 
+						result["county"]["name"] = county["name"]
+					elsif ['COP','LBW','LGE','MTW','UTE','UTW'].include?(info["type"])
+						council = postcode["areas"].fetch(info["parent_area"].to_s)
+						result["council"]["id"] = council["codes"]["ons"]
+						result["council"]["name"] = council["name"]
+					end
+				end
+			rescue Exception => e
+				result["error"] = e.inspect
 			end
 		end
 		

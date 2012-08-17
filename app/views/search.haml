@@ -1,3 +1,16 @@
+%ul#breadcrumb
+	%li
+		%a{:href => "http://www.lichfielddc.gov.uk/"}
+			Home
+	%li	
+		%a{:href => "http://www.lichfielddc.gov.uk/info/100001/advice_and_benefits"}
+			Licenses and Street Trading
+	%li
+		%a{:href => "/"}
+			Licensing register
+	%li.bc_end
+		Search Results
+
 %h1 Search results
 
 - if @applications.length > 0
@@ -36,6 +49,13 @@
 						= app.receiveddate.strftime("%d/%m/%Y") rescue nil
 	
 	= will_paginate @applications, :id => 'az_index', :renderer => BootstrapPagination::Sinatra
+	
+	.clear
+	
+	%p
+		%a{:href=> "/search.rss?#{request.query_string}"}
+			= image_tag("http://www.lichfielddc.gov.uk/site/images/xml.gif")
+			Get an RSS feed for this search
 
 - else
 	
