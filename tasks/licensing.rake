@@ -113,7 +113,7 @@ task :import => :environment do
 	end
 	
 	rows.each do |row|
-		if row["LIPERMIT"] != "" && row["LIPERMIT_LIEVENT"] != "TEMP"
+		if row["LIPERMIT_LIPERMIT"] != "" && row["LIPERMIT_LIEVENT"] != "TEMP"
 			app = Application.find_by_keyval(row["LIPERMIT_PKEYVAL"])
 			
 			unless app.nil?

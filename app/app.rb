@@ -3,6 +3,8 @@ class Licensing < Padrino::Application
   register Padrino::Mailer
   register Padrino::Helpers
   include WillPaginate::Sinatra::Helpers
+  
+  set :delivery_method, :sendmail
 
   enable :sessions
   
