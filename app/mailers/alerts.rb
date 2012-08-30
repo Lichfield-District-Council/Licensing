@@ -45,11 +45,11 @@ Licensing.mailer :alerts do
     via :sendmail
   end
 
-  email :send_alert do |email,radius,postcode,hash,applications|
+  email :send_alert do |email,radius,postcode,hash,application|
     from 'licensing@lichfielddc.gov.uk'
     to email
-    subject "There has been a new licensing application in your area"
-    locals :radius => radius, :postcode => postcode, :hash => hash, :applications => applications
+    subject "New Licensing Application: #{application.address.strip.gsub(/\n/, ' ')}"
+    locals :radius => radius, :postcode => postcode, :hash => hash, :application => application
     render 'alerts/send_alert'
     content_type :html 
     via :sendmail

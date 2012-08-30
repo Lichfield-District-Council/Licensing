@@ -83,7 +83,7 @@
 
 			%p
 				= f.label :radius, :caption => "Within "
-				= f.select :radius, :options => [1, 2, 5], :include_blank => ''
+				= f.select :radius, :options => [0.5, 1, 2], :include_blank => ''
 				mile(s) of
 				= f.text_field :postcode, :class => "field", :placeholder => "Postcode",  :value => @alert.postcode
 

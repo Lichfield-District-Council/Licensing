@@ -66,6 +66,7 @@ end
 get '/view/*refval', :provides => [:html, :json, :xml] do
 	refval = params[:refval].join("/")
 	@app = Application.find_by_refval(refval)
+	@comment = Comment.new
 	case content_type
 		when :html then
 			render 'view.haml'
@@ -121,9 +122,31 @@ get 'activate' do
 	redirect '/'
 end
 
+get 'remove' do
+	alert = Alert.find_by_hash(params[:hash])
+	if alert.nil?
+		flash[:notice] = "Sorry, we could not cancel your alert. Perhaps you already cancelled it?. If you think this is our error, please email <a href='mailto:webmaster@lichfielddc.gov.uk'>webmaster@lichfielddc.gov.uk</a>"
+		redirect '/'
+	else
+		alert.destroy
+		alert.save
+		flash[:notice] = "Thank you, your alert has been sucessfully removed. You will no longer receive licensing alerts from us."
+		redirect '/'
+	end
+end
+
 post 'comment' do
-	deliver(:comments, :send_comments, params[:refval],params[:name],params[:email],params[:address],params[:tel],params[:comments])
-	redirect "/view/#{params[:refval]}"
+	@comment = Comment.new(params[:comment])
+	logger.info params[:comment]
+	if @comment.save
+		deliver(:comments, :send_comments, @comment.refval,@comment.name,@comment.email,@comment.address,@comment.tel,@comment.comments)
+		flash[:notice] = "Thank you, your comment has been sent."
+		redirect "/view/#{@comment.refval}"
+	else
+		refval = params[:comment]["refval"]
+		@app = Application.find_by_refval(refval)
+		render "view.haml"
+	end
 end
 
   ##

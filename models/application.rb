@@ -2,8 +2,8 @@ class Application
   include MongoMapper::Document
   ensure_index [[:latlng, '2d']]
 
+  key :_id, String
   key :refval, String
-  key :keyval, String
   key :applicantname, String
   key :latlng, Array
   key :address, String
@@ -19,24 +19,28 @@ class Application
   key :validfrom, Date
   timestamps!
   
-  many :activities  
-  many :notices  
+  many :activities, :class_name => 'Activity', :foreign_key => :pkeyval
+  many :notices, :class_name => 'Notice', :foreign_key => :pkeyval
 end
 
 class Activity
-  include MongoMapper::EmbeddedDocument
+  include MongoMapper::Document
 
+  key :pkeyval, String
+  key :keyval, String
   key :type, String  
   key :cycle, String
   key :open, String
   key :close, String
+  timestamps!
   
-  belongs_to :application
+  belongs_to :application, :class_name => 'Application'
 end
 
 class Notice
-  include MongoMapper::EmbeddedDocument
+  include MongoMapper::Document
 
+  key :pkeyval, String
   key :keyval, String
   key :recieveddate, Date
   key :startdate, Date
@@ -44,8 +48,9 @@ class Notice
   key :days, String  
   key :hours, String
   key :activities, Array
+  timestamps!
 
-  belongs_to :application
+  belongs_to :application, :class_name => 'Application'
 end
 
 class Codes
@@ -72,4 +77,21 @@ class Alert
   validates_presence_of :postcode
   validates_presence_of :radius
   validates_uniqueness_of :email
+end
+
+class Comment
+	include MongoMapper::Document
+	
+	key :refval, String
+	key :name, String
+	key :email, String
+	key :address, String
+	key :tel, String
+	key :comments, String
+	key :website, String
+
+	validates_presence_of :name
+	validates_presence_of :address
+	validates_presence_of :comments
+	validates :website, :length => { :is => 0 }
 end

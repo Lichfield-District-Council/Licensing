@@ -3,12 +3,17 @@ task :alert => :environment do
 	alerts = Alert.where(:confirmed => true)
 	
 	alerts.each do |alert|
-	
+		
 		EARTH_RADIUS_M = 3959		
 		applications = Application.where(:latlng => {'$nearSphere' => [alert.latlng[0], alert.latlng[1]], '$maxDistance' => Float(alert.radius.to_i) / EARTH_RADIUS_M }, '$or' => [{:receiveddate => {:$gte => alert.lastsent.to_mongo, :$lte => Date.to_mongo(Date.today)}}, {'notices.receiveddate' => {:$gte => alert.lastsent.to_mongo, :$lte => Date.to_mongo(Date.today)}}])
 		
+		puts "#{alert.email} - #{applications.count} applications found!" 
+		
 		if applications.count > 0
-			Licensing.deliver(:alerts, :send_alert, alert.email, alert.radius, alert.postcode, alert.hash, applications)
+			applications.each do |application|
+				puts application.address
+				Licensing.deliver(:alerts, :send_alert, alert.email, alert.radius, alert.postcode, alert.hash, application)
+			end
 		end
 		
 		alert.update_attributes(:lastsent => Date.to_mongo(Date.today))
@@ -75,8 +80,8 @@ task :import => :environment do
 				
 			
 			app.update_attributes(
+				:_id => row["LICASE_KEYVAL"],
 				:refval => row["LICASE_REFVAL"],
-				:keyval => row["LICASE_KEYVAL"],
 				:applicantname => row["LIPARTY_FULLNAME"],
 				:applicantaddress => row["LIPARTY_ADDRESS"],
 				:latlng => [latlng["lat"], latlng["long"]],
@@ -92,9 +97,7 @@ task :import => :environment do
 			    :status => row["LICASE_LISTAT"],
 			    :validfrom => validfrom
 			)
-				
-			app.activities.clear
-			app.notices.clear	
+
 			app.save
 		end
 	end
@@ -114,23 +117,21 @@ task :import => :environment do
 	
 	rows.each do |row|
 		if row["LIPERMIT_LIPERMIT"] != "" && row["LIPERMIT_LIEVENT"] != "TEMP"
-			app = Application.find_by_keyval(row["LIPERMIT_PKEYVAL"])
 			
-			unless app.nil?
+			activity = Activity.first_or_create(:keyval => row["LIPERMIT_KEYVAL"])
 			
-				row["LIPERMIT_LIPERMIT"] = Codes.where(:category => "LIPERMIT", :code => row["LIPERMIT_LIPERMIT"]).first.description rescue nil
-				row["LIPERMIT_LICYCLE"] = Codes.where(:category => "LICYCLE", :code => row["LIPERMIT_LICYCLE"]).first.description rescue nil
+			row["LIPERMIT_LIPERMIT"] = Codes.where(:category => "LIPERMIT", :code => row["LIPERMIT_LIPERMIT"]).first.description rescue nil
+			row["LIPERMIT_LICYCLE"] = Codes.where(:category => "LICYCLE", :code => row["LIPERMIT_LICYCLE"]).first.description rescue nil
 				
-					app.activities.build(
-						:type => row["LIPERMIT_LIPERMIT"],
-						:cycle =>  row["LIPERMIT_LICYCLE"],
-						:open => row["LIPERMIT_OPENT"],
-						:close => row["LIPERMIT_CLOST"]
-					)
-					
-				app.save
-			
-			end
+			activity.update_attributes(
+				:pkeyval => row["LIPERMIT_PKEYVAL"],
+				:type => row["LIPERMIT_LIPERMIT"],
+				:cycle =>  row["LIPERMIT_LICYCLE"],
+				:open => row["LIPERMIT_OPENT"],
+				:close => row["LIPERMIT_CLOST"]
+			)
+				
+			activity.save
 			
 		end
 	end
@@ -149,25 +150,23 @@ task :import => :environment do
 	end
 	
 	rows.each do |row|
-		
-		app = Application.find_by_keyval(row["LITEMPNOTICES_PKEYVAL"])
-		
-		unless app.nil?
 				
-			row["LITEMPNOTICES_DATERECV"] = Date.parse(row["LITEMPNOTICES_DATERECV"]).to_mongo rescue nil
-			row["LITEMPNOTICES_STARTDT"] = Date.parse(row["LITEMPNOTICES_STARTDT"]).to_mongo rescue nil
-			row["LITEMPNOTICES_ENDDT"] = Date.parse(row["LITEMPNOTICES_ENDDT"]).to_mongo rescue nil
-			
-			app.notices.build(
-				:receiveddate => row["LITEMPNOTICES_DATERECV"],
-				:startdate => row["LITEMPNOTICES_STARTDT"],
-				:enddate => row["LITEMPNOTICES_ENDDT"],
-				:days => row["LITEMPNOTICES_EVENTDAYS"],
-				:hours => row["LITEMPNOTICES_EVENTHRS"]
-			)
-			
-			app.save
+		notice = Notice.first_or_create(:keyval => row["LITEMPNOTICES_KEYVAL"])
+						
+		row["LITEMPNOTICES_DATERECV"] = Date.parse(row["LITEMPNOTICES_DATERECV"]).to_mongo rescue nil
+		row["LITEMPNOTICES_STARTDT"] = Date.parse(row["LITEMPNOTICES_STARTDT"]).to_mongo rescue nil
+		row["LITEMPNOTICES_ENDDT"] = Date.parse(row["LITEMPNOTICES_ENDDT"]).to_mongo rescue nil
 		
-		end
+		notice.update_attributes(
+			:pkeyval => row["LITEMPNOTICES_PKEYVAL"],
+			:receiveddate => row["LITEMPNOTICES_DATERECV"],
+			:startdate => row["LITEMPNOTICES_STARTDT"],
+			:enddate => row["LITEMPNOTICES_ENDDT"],
+			:days => row["LITEMPNOTICES_EVENTDAYS"],
+			:hours => row["LITEMPNOTICES_EVENTHRS"]
+		)
+		
+		notice.save
+		
 	end	
 end
