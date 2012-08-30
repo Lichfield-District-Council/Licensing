@@ -8,7 +8,7 @@ json.application do
 	json.mainUse app.usetype
 	json.caseType app.casetype
 	json.status app.status
-	json.recievedDate app.recieveddate
+	json.receivedDate app.receiveddate
 	json.commentsClosingDate app.closingdate
 	json.activities(app.activities) do |activity|
 		json.type activity.type
@@ -16,5 +16,11 @@ json.application do
 		json.from activity.open
 		json.to activity.close
 	end
-	
+	json.notices(app.notices) do |notice|
+		json.startDate notice.startdate
+		json.endDate notice.enddate
+		json.hours notice.hours
+		json.days notice.days
+		json.receivedDate notice.receiveddate
+	end
 end

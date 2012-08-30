@@ -9,7 +9,7 @@ xml.application do
 	xml.mainUse app.usetype
 	xml.caseType app.casetype
 	xml.status app.status
-	xml.recievedDate app.recieveddate
+	xml.receivedDate app.recieveddate
 	xml.commentsClosingDate app.closingdate
 	xml.activities do
 		app.activities.each do |activity|
@@ -18,6 +18,17 @@ xml.application do
 				xml.days activity.cycle
 				xml.from activity.open
 				xml.to activity.close
+			end
+		end
+	end
+	xml.notices do
+		app.notices.each do |notice|
+			xml.notice do
+				xml.startDate notice.startdate
+				xml.endDate notice.enddate
+				xml.hours notice.hours
+				xml.days notice.days
+				xml.receivedDate notice.receiveddate
 			end
 		end
 	end

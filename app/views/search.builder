@@ -11,7 +11,13 @@ xml.applications do
 			xml.applicantName app.applicantname
 			xml.address app.address
 			xml.type app.type
-			xml.recievedDate app.recieveddate
+
+			if app.details == "Temporary Event Notice"
+				xml.receivedDate app.notices.sort_by(&:recieveddate).reverse[0].receiveddate rescue app.receiveddate
+			else
+				xml.receivedDate app.receiveddate rescue nil
+			end
+
 		end
 	end
 end

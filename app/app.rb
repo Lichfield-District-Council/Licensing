@@ -41,6 +41,7 @@ get "/search", :provides => [:html, :json, :xml] do
 		unless params[:location].blank?
 			query[:address] = /#{params[:location]}/i
 		end
+		
 	end
 	
 	applications = Application.where(query).limit(100000)
@@ -58,7 +59,7 @@ get "/search", :provides => [:html, :json, :xml] do
 			when :xml then
 				render 'search.builder'
 			when :rss then
-				render 'search.rss.builder'
+				render 'searchrss.builder'
 			end
 	end
 end

@@ -8,5 +8,9 @@ json.applications(@applications) do |app|
 	json.applicantName app.applicantname
 	json.address app.address
 	json.type app.type
-	json.recievedDate app.recieveddate
+	if app.details == "Temporary Event Notice"
+		json.receivedDate app.notices.sort_by(&:recieveddate).reverse[0].receiveddate rescue app.receiveddate
+	else
+		json.receivedDate app.receiveddate rescue nil
+	end
 end
